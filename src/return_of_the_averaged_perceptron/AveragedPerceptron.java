@@ -1,28 +1,36 @@
 package return_of_the_averaged_perceptron;
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.Set;
-import java.util.Map.Entry;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
 
 public class AveragedPerceptron 
 {
-	  static int MAX_ITER = 100;
+	  static int MAX_ITER = 1;
 	  static double LEARNING_RATE = 0.1;           
 	  static int theta = 0; 
 	  
-      static final String LABEL = "atheism";
-      //static final String LABEL = "sports";
+      //static final String LABEL = "atheism";
+      static final String LABEL = "sports";
       //static final String LABEL = "science";
 	  
 	  public static void perceptron( Table< int[] , String , Integer > train_freq_count_against_globo_dict,
 			  					     Table< int[] , String , Integer > test_freq_count_against_globo_dict,
 			  						 Set<String> GLOBO_DICT )
 	  {
+		  
+		   //store weights to be averaged. 
+		   //Map<Integer,double[]> cached_weights = new HashMap<Integer,double[]>();  
+		   Multiset<double[]> cached_weights = HashMultiset.create();
+
+
+		  
+		  
 		  int globo_dict_size = GLOBO_DICT.size();
 		  int number_of_files__train = train_freq_count_against_globo_dict.size();
 		  
@@ -82,6 +90,15 @@ public class AveragedPerceptron
 				  //summation of squared error (error value for all instances)
 				  globalError += (localError*localError);
 			  }
+			  
+//			  System.out.println("weights: ");
+//			  System.out.println(Arrays.toString(weights));
+//			  System.out.println();
+			  
+			  
+			  
+	           //store weights for averaging
+	           cached_weights.add( Arrays.copyOf(weights, weights.length) );
 
 			  /* Root Mean Squared Error */
 			  if (iteration < 10) 
@@ -92,29 +109,35 @@ public class AveragedPerceptron
 		  } 
 		  while(globalError != 0 && iteration<=MAX_ITER);
 		  
+	
 		  
 		  
-		   //store weights to be averaged. 
-		   Map<Integer,double[]> cached_weights = new HashMap<Integer,double[]>();  
+	
+		  
 		  
 	       //compute averages
 	       double[] sums = new double[ globo_dict_size + 1 ];
 	       double[] averages = new double[ globo_dict_size + 1 ];
 
-	       for (Entry<Integer, double[]> entry : cached_weights.entrySet()) 
+	       for (Multiset.Entry<double[]> entry : cached_weights.entrySet() ) 
 	       {
-	           double[] value = entry.getValue();
-	           for(int pos=0; pos < globo_dict_size + 1; pos++){
+	           double[] value = entry.getElement();
+	           
+	           for(int pos=0; pos < globo_dict_size + 1; pos++)
+	           {
 	               sums[ pos ] +=  value[ pos ]; 
 	           }
 	       }
-	       for(int pos=0; pos < globo_dict_size + 1; pos++){
+	       for(int pos=0; pos < globo_dict_size + 1; pos++)
+	       {
 	           averages[ pos ] = sums[ pos ] / cached_weights.size(); 
 	       }
 		  
-		  
-		  
-		  
+//			  System.out.println("averages: ");
+//			  System.out.println(Arrays.toString( averages ));
+//			  System.out.println();
+			  
+			  
 	        
 	        
 	       int number_of_files__test = test_freq_count_against_globo_dict.size();
