@@ -11,7 +11,7 @@ import com.google.common.collect.Table.Cell;
 
 public class AveragedPerceptron 
 {
-	  static int MAX_ITER = 1;
+	  static int MAX_ITER = 1000;
 	  static double LEARNING_RATE = 0.1;           
 	  static int theta = 0; 
 	  
